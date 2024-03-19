@@ -63,14 +63,13 @@ class GitRepository_Manager:
     #%% Magicc methods
     def __init__(self, 
                  path_to_repo,
-                 source_file,
                  debugmode=False):
         
         # config
         self.cfg = dict(
             DEBUG= debugmode,
             PATH_TO_DATASHELF = path_to_repo,
-            SOURCE_FILE = source_file,
+            SOURCE_FILE = os.path.join(path_to_repo, 'sources.csv'),
             )
         
         
