@@ -1,0 +1,12 @@
+appdirs
+pandas>=1.1.0
+numpy
+gitpython
+pint>=0.11
+tqdm
+openpyxl
+xarray
+pint-xarray
+deprecated
+xlsxwriter
+tabulate
