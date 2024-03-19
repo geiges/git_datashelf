@@ -57,23 +57,23 @@ def _create_empty_datashelf(
 
     # add subfolders database
     Path(os.path.join(pathToDataself, 'database')).mkdir()
-    Path(os.path.join(pathToDataself, 'mappings')).mkdir()
+    #Path(os.path.join(pathToDataself, 'mappings')).mkdir()
     Path(os.path.join(pathToDataself, 'rawdata')).mkdir()
 
-    # create mappings
-    os.makedirs(os.path.join(pathToDataself, 'mappings'), exist_ok=True)
-    shutil.copyfile(
-        os.path.join(MODULE_PATH, 'data/regions.csv'),
-        os.path.join(pathToDataself, 'mappings/regions.csv'),
-    )
-    shutil.copyfile(
-        os.path.join(MODULE_PATH, 'data/continent.csv'),
-        os.path.join(pathToDataself, 'mappings/continent.csv'),
-    )
-    shutil.copyfile(
-        os.path.join(MODULE_PATH, 'data/country_codes.csv'),
-        os.path.join(pathToDataself, 'mappings/country_codes.csv'),
-    )
+    # # create mappings
+    # os.makedirs(os.path.join(pathToDataself, 'mappings'), exist_ok=True)
+    # shutil.copyfile(
+    #     os.path.join(MODULE_PATH, 'data/regions.csv'),
+    #     os.path.join(pathToDataself, 'mappings/regions.csv'),
+    # )
+    # shutil.copyfile(
+    #     os.path.join(MODULE_PATH, 'data/continent.csv'),
+    #     os.path.join(pathToDataself, 'mappings/continent.csv'),
+    # )
+    # shutil.copyfile(
+    #     os.path.join(MODULE_PATH, 'data/country_codes.csv'),
+    #     os.path.join(pathToDataself, 'mappings/country_codes.csv'),
+    # )
 
     sourcesDf = pd.DataFrame(columns=SOURCE_META_FIELDS)
     filePath = os.path.join(pathToDataself, 'sources.csv')
