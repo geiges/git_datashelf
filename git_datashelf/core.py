@@ -18,7 +18,7 @@ from threading import Thread
 from collections import defaultdict
 from pathlib import Path
 
-import config
+from . import config
 
 
 #%% Functions 
@@ -73,10 +73,10 @@ class GitRepository_Manager:
             )
         
         
-        self.sources = pd.read_csv(self.cfg.SOURCE_FILE, index_col="SOURCE_ID")
+        self.sources = pd.read_csv(self.cfg['SOURCE_FILE'], index_col="SOURCE_ID")
 
         remote_repo_path = os.path.join(
-            self.cfg.PATH_TO_REPO, "remote_sources", "source_states.csv"
+            self.cfg['PATH_TO_DATASHELF'], "remote_sources", "source_states.csv"
         )
         if os.path.exists(remote_repo_path):
             self.remote_sources = pd.read_csv(remote_repo_path, index_col=0)
@@ -108,11 +108,11 @@ class GitRepository_Manager:
         
         if not debugmode:
             for sourceID in self.sources.index:
-                repoPath = os.path.join(self.PATH_TO_DATASHELF, "database", sourceID)
+                repoPath = os.path.join( self.cfg['PATH_TO_DATASHELF'], "database", sourceID)
                 self.repositories[sourceID] = git.Repo(repoPath)
                 self.verifyGitHash(sourceID)
 
-            self.repositories["main"] = git.Repo(self.PATH_TO_DATASHELF)
+            self.repositories["main"] = git.Repo( self.cfg['PATH_TO_DATASHELF'])
             self._validateRepository("main")
         else:
             print("Git manager initialized in debugmode")
@@ -163,12 +163,12 @@ class GitRepository_Manager:
         return pd.isna(last_access_date) or curr_date > last_access_date
   
     def _init_remote_repo(self):   
-        remote_repo_path = os.path.join(self.cfg.PATH_TO_REPO, "remote_sources")
+        remote_repo_path = os.path.join(self.cfg['PATH_TO_DATASHELF'], "remote_sources")
         if os.path.exists(remote_repo_path):
             self.remote_repo = self._get_remote_sources_repo()
             
             dpath = os.path.join(
-            self.cfg.PATH_TO_REPO,
+            self.cfg['PATH_TO_DATASHELF'],
             "remote_sources",
             "source_states.csv",
                 )
@@ -178,17 +178,17 @@ class GitRepository_Manager:
             self.remote_sources = pd.DataFrame()
             
     def _get_remote_sources_repo(self):
-        remote_repo_path = os.path.join(self.cfg.PATH_TO_REPO, "remote_sources")
+        remote_repo_path = os.path.join(self.cfg['PATH_TO_DATASHELF'], "remote_sources")
         remote_repo = git.Repo(remote_repo_path)
 
         return remote_repo
 
     def _pull_remote_sources(self):
 
-        remote_repo_path = os.path.join(self.cfg.PATH_TO_REPO, "remote_sources")
+        remote_repo_path = os.path.join(self.cfg['PATH_TO_DATASHELF'], "remote_sources")
         if os.path.exists(remote_repo_path):
             # pull
-            remote_repo_path = os.path.join(self.cfg.PATH_TO_REPO, "remote_sources")
+            remote_repo_path = os.path.join(self.cfg['PATH_TO_DATASHELF'], "remote_sources")
             remote_repo = git.Repo(remote_repo_path)
             remote_repo.remote("origin").pull(progress=TqdmProgressPrinter())
 
@@ -206,7 +206,7 @@ class GitRepository_Manager:
         url = config.DATASHELF_REMOTE + "remote_sources.git"
         remote_repo = git.Repo.clone_from(
             url=url,
-            to_path=os.path.join(self.cfg.PATH_TO_REPO, "remote_sources"),
+            to_path=os.path.join(self.cfg['PATH_TO_DATASHELF'], "remote_sources"),
             progress=TqdmProgressPrinter(),
         )
         self._update_last_remote_access()
@@ -215,7 +215,7 @@ class GitRepository_Manager:
 
     def _get_last_remote_access(self):
         filepath = os.path.join(
-            self.cfg.PATH_TO_REPO, "remote_sources", "last_accessed_remote"
+            self.cfg['PATH_TO_DATASHELF'], "remote_sources", "last_accessed_remote"
         )
         if not os.path.exists(filepath):
             return np.nan
@@ -226,7 +226,7 @@ class GitRepository_Manager:
     def _update_last_remote_access(self):
 
         filepath = os.path.join(
-            self.cfg.PATH_TO_REPO, "remote_sources", "last_accessed_remote"
+            self.cfg['PATH_TO_DATASHELF'], "remote_sources", "last_accessed_remote"
         )
         with open(filepath, "w") as f:
             f.write(get_time_string())
@@ -241,11 +241,11 @@ class GitRepository_Manager:
     def _update_remote_sources(self, repoName):
 
         dpath = os.path.join(
-            self.cfg.PATH_TO_REPO,
+            self.cfg['PATH_TO_DATASHELF'],
             "remote_sources",
             "source_states.csv",
         )
-        remote_repo = git.Repo(os.path.join(self.cfg.PATH_TO_REPO, "remote_sources"))
+        remote_repo = git.Repo(os.path.join(self.cfg['PATH_TO_DATASHELF'], "remote_sources"))
         rem_sources_df = pd.read_csv(dpath, index_col=0)
 
         repo = self[repoName]
@@ -446,7 +446,7 @@ class GitRepository_Manager:
         """
         Retrieve `sourceID` from repositories dictionary without checks
         """
-        repoPath = os.path.join(self.PATH_TO_DATASHELF, "database", sourceID)
+        repoPath = os.path.join( self.cfg['PATH_TO_DATASHELF'], "database", sourceID)
         repo = git.Repo(repoPath)
         return repo
 
@@ -681,7 +681,7 @@ class GitRepository_Manager:
 
         self[repoName].remote("origin").pull(progress=TqdmProgressPrinter())
         self.updateGitHash_and_Tag(repoName)
-        repoPath = os.path.join(self.PATH_TO_DATASHELF, "database", repoName)
+        repoPath = os.path.join( self.cfg['PATH_TO_DATASHELF'], "database", repoName)
         sourceInventory = pd.read_csv(
             os.path.join(repoPath, "source_inventory.csv"),
             index_col=0,
